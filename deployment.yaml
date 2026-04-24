@@ -1,3 +1,7 @@
-ports:
-  - name: http
-    containerPort: 80
+containers:
+  - name: amazon
+    image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+    imagePullPolicy: Always
+    ports:
+      - name: http
+        containerPort: 80
