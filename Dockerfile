@@ -1,24 +1,24 @@
 # ---------- BUILD STAGE ----------
-FROM node:16-alpine AS builder
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
-RUN npm run build   # 🔥 creates production build
+RUN npm run build
 
 # ---------- PRODUCTION STAGE ----------
 FROM nginx:alpine
 
-# Remove default nginx files
+# Remove default nginx content
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy build output (VERY IMPORTANT)
+# Copy React build
 COPY --from=builder /app/build /usr/share/nginx/html
 
-# Expose port
+# Expose nginx port
 EXPOSE 80
 
 # Start nginx
