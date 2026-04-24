@@ -2,7 +2,9 @@ name: Secure CI Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - feature-dev   # 🔥 add your working branch
   workflow_dispatch:
 
 jobs:
@@ -13,23 +15,17 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    # 🔥 Install Trivy (OFFICIAL SCRIPT - NO VERSION ISSUE)
+    # 🔧 Install Trivy
     - name: Install Trivy
       run: |
         sudo apt-get update
-        sudo apt-get install -y curl
-        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+        sudo apt-get install -y wget
+        wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.50.2_Linux-64bit.deb
+        sudo dpkg -i trivy_0.50.2_Linux-64bit.deb
 
-    # 🔐 Scan source
+    # 🔐 Scan code
     - name: Trivy FS Scan
       run: trivy fs --severity HIGH,CRITICAL --exit-code 1 .
-
-    # 🔑 Docker Login
-    - name: Login DockerHub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
 
     # 🐳 Build image
     - name: Build Docker Image
@@ -39,7 +35,14 @@ jobs:
     - name: Trivy Image Scan
       run: trivy image --severity HIGH,CRITICAL --exit-code 1 suriya396/amazon:${{ github.sha }}
 
-    # 🚀 Push image
+    # 🔑 Docker login
+    - name: Login DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    # 🚀 Push
     - name: Push Docker Image
       run: |
         docker push suriya396/amazon:${{ github.sha }}
