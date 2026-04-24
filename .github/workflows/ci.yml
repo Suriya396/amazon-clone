@@ -8,47 +8,58 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v4
+    permissions:
+      contents: write   # 🔥 REQUIRED for git push
 
-    # 🔧 Install Trivy
-    - run: |
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # 🔧 Install Trivy (FIXED - no version issue)
+    - name: Install Trivy
+      run: |
         sudo apt-get update
         sudo apt-get install -y wget
-        wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.50.2_Linux-64bit.deb
-        sudo dpkg -i trivy_0.50.2_Linux-64bit.deb
+        wget -qO- https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
 
     # 🔐 Scan code
-    - run: trivy fs --severity HIGH,CRITICAL --exit-code 1 .
+    - name: Trivy FS Scan
+      run: trivy fs --severity HIGH,CRITICAL --exit-code 1 .
 
     # 🔑 Docker login
-    - uses: docker/login-action@v3
+    - name: Login DockerHub
+      uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # 🐳 Build
-    - run: docker build -t suriya396/amazon:${{ github.sha }} .
+    # 🐳 Build image
+    - name: Build Docker Image
+      run: docker build -t suriya396/amazon:${{ github.sha }} .
 
     # 🔐 Scan image
-    - run: trivy image --severity CRITICAL --exit-code 1 suriya396/amazon:${{ github.sha }}
+    - name: Trivy Image Scan
+      run: trivy image --severity CRITICAL --exit-code 1 suriya396/amazon:${{ github.sha }}
 
-    # 🚀 Push
-    - run: |
+    # 🚀 Push image
+    - name: Push Docker Image
+      run: |
         docker push suriya396/amazon:${{ github.sha }}
         docker tag suriya396/amazon:${{ github.sha }} suriya396/amazon:latest
         docker push suriya396/amazon:latest
 
-    # 🔥 UPDATE HELM FILE (AUTO DEPLOY TRIGGER)
+    # 🔥 Update Helm values.yaml safely
     - name: Update Helm values
       run: |
-        sed -i "s/tag: .*/tag: \"${{ github.sha }}\"/" amazon/values.yaml
+        sed -i "s/tag:.*/tag: \"${{ github.sha }}\"/" amazon/values.yaml
 
-    # 🔁 COMMIT BACK TO REPO
+    # 🔁 Commit & push back (FIXED)
     - name: Commit updated tag
       run: |
         git config user.name "github-actions"
         git config user.email "actions@github.com"
+
+        git pull origin main --rebase   # 🔥 avoid push conflicts
         git add amazon/values.yaml
         git commit -m "update image tag to ${{ github.sha }}" || echo "no changes"
-        git push
+        git push origin HEAD:main
