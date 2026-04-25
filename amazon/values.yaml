@@ -10,9 +10,9 @@ image:
   repository: suriya396/amazon
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
-  tag: "c87565788b65f421a29d73611fb4815c9243ca96"
+  tag: "cb8c05aa4bcd67970c1ba5a035b7c71448a1f7e4"
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "c87565788b65f421a29d73611fb4815c9243ca96"
+  tag: "cb8c05aa4bcd67970c1ba5a035b7c71448a1f7e4"
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
