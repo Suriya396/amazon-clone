@@ -1,0 +1,11 @@
+replicaCount: 1
+
+image:
+  repository: suriya396/amazon
+  tag: latest
+
+env: dev
+
+ingress:
+  hosts:
+    - host: dev.amazon.local

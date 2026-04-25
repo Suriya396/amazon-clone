@@ -1,0 +1,11 @@
+replicaCount: 2
+
+image:
+  repository: suriya396/amazon
+  tag: latest
+
+env: staging
+
+ingress:
+  hosts:
+    - host: staging.amazon.local
