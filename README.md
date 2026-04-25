@@ -349,3 +349,5 @@ pipeline {
 For further details, refer to the word document containing a complete write-up of the project.
 
 ---
+t e s t   a u t o   d e p l o y  
+ 
