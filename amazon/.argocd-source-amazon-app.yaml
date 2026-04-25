@@ -4,5 +4,5 @@ helm:
     value: suriya396/amazon
     forcestring: true
   - name: image.tag
-    value: 1b7b3f4c111c89570e3df113831a47c2aaf0e8ed
+    value: a3d66fc6d9dcb1d06d5d2d45a90d3ca3b7d63171
     forcestring: true
