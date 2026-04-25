@@ -9,3 +9,6 @@ env: prod
 ingress:
   hosts:
     - host: amazon.local
+      paths:
+        - path: /
+          pathType: Prefix

@@ -9,3 +9,6 @@ env: dev
 ingress:
   hosts:
     - host: dev.amazon.local
+      paths:
+        - path: /
+          pathType: Prefix

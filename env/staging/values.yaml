@@ -9,3 +9,6 @@ env: staging
 ingress:
   hosts:
     - host: staging.amazon.local
+      paths:
+        - path: /
+          pathType: Prefix
